@@ -1,12 +1,15 @@
-// App.jsx
 import { useState, useEffect } from 'react';
 import Feedback from './Feedback/Feedback';
 import Options from './Options/Options';
 import Description from './Description/Description';
-const App = () => {
+import Notification from './Notification/Notification';
+const getInitialFeedbackState = () => {
   const initialFeedback = { good: 0, neutral: 0, bad: 0 };
   const storedFeedback = JSON.parse(localStorage.getItem('feedback')) || initialFeedback;
-  const [feedback, setFeedback] = useState(storedFeedback);
+  return storedFeedback;
+};
+const App = () => {
+  const [feedback, setFeedback] = useState(getInitialFeedbackState());
   useEffect(() => {
     localStorage.setItem('feedback', JSON.stringify(feedback));
   }, [feedback]);
@@ -17,16 +20,20 @@ const App = () => {
     }));
   };
   const resetFeedback = () => {
+    const initialFeedback = { good: 0, neutral: 0, bad: 0 };
     setFeedback(initialFeedback);
   };
   const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
   return (
     <div>
-      <Description /> {}
+      <Description />
       <Options updateFeedback={updateFeedback} totalFeedback={totalFeedback} resetFeedback={resetFeedback} />
-      <Feedback feedback={feedback} totalFeedback={totalFeedback} />
+      {totalFeedback > 0 ? (
+        <Feedback feedback={feedback} totalFeedback={totalFeedback} />
+      ) : (
+        <Notification />
+      )}
     </div>
   );
 };
-
 export default App;
